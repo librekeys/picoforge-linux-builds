@@ -29,6 +29,8 @@ RUN wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continu
     cd /tmp && /tmp/linuxdeploy.AppImage --appimage-extract && \
     mv /tmp/squashfs-root /usr/local/share/linuxdeploy && \
     ln -s /usr/local/share/linuxdeploy/AppRun /usr/local/bin/linuxdeploy && \
+    rm -f /usr/local/share/linuxdeploy/usr/bin/strip && \
+    ln -s /usr/bin/strip /usr/local/share/linuxdeploy/usr/bin/strip && \
     rm /tmp/linuxdeploy.AppImage
 
 WORKDIR /workspace
