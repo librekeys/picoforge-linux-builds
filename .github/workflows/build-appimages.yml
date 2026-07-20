@@ -52,7 +52,7 @@ jobs:
           IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/picoforge-appimage-builder:${{ matrix.image_tag }}"
           echo "Attempting to pull public container image: ${IMAGE_NAME}..."
           if ! podman pull "${IMAGE_NAME}"; then
-            echo "Prebuilt container image not found on GHCR. Building locally via ${matrix.containerfile}..."
+            echo "Prebuilt container image not found on GHCR. Building locally via ${{ matrix.containerfile }}..."
             podman build -t "${IMAGE_NAME}" -f ${{ matrix.containerfile }} .
           fi
 
