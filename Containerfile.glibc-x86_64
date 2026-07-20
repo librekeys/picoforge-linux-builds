@@ -4,9 +4,9 @@ FROM rockylinux:8
 RUN dnf install -y epel-release dnf-plugins-core && \
     dnf config-manager --set-enabled powertools && \
     dnf install -y \
-        gcc-toolset-13-gcc \
-        gcc-toolset-13-gcc-c++ \
-        gcc-toolset-13-binutils \
+        gcc-toolset-15-gcc \
+        gcc-toolset-15-gcc-c++ \
+        gcc-toolset-15-binutils \
         make \
         pkgconf-pkg-config \
         curl \
@@ -26,10 +26,10 @@ RUN dnf install -y epel-release dnf-plugins-core && \
         libX11-devel && \
     dnf clean all
 
-# Environment setup for GCC Toolset 13 and Rust
+# Environment setup for GCC Toolset 15 and Rust
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
-    PATH=/usr/local/cargo/bin:/opt/rh/gcc-toolset-13/root/usr/bin:$PATH
+    PATH=/usr/local/cargo/bin:/opt/rh/gcc-toolset-15/root/usr/bin:$PATH
 
 # Install Rust stable toolchain
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable && \
