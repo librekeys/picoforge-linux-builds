@@ -1,0 +1,5 @@
+dist/
+target/
+AppDir/
+*.AppImage
+*.tar.gz

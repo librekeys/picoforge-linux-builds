@@ -1,0 +1,67 @@
+name: Build AppImages (Podman)
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-appimage:
+    name: Build ${{ matrix.variant }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: glibc-x86_64
+            runner: ubuntu-latest
+            containerfile: Containerfile.glibc-x86_64
+          - variant: glibc-aarch64
+            runner: ubuntu-24.04-arm
+            containerfile: Containerfile.glibc-aarch64
+          - variant: musl-x86_64
+            runner: ubuntu-latest
+            containerfile: Containerfile.musl-x86_64
+          - variant: musl-aarch64
+            runner: ubuntu-24.04-arm
+            containerfile: Containerfile.musl-aarch64
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout picoforge-linux-builds
+        uses: actions/checkout@v7
+
+      - name: Checkout PicoForge source code
+        uses: actions/checkout@v7
+        with:
+          repository: librekeys/picoforge
+          path: picoforge
+
+      - name: Build Podman container image
+        run: |
+          podman build -t picoforge-builder:${{ matrix.variant }} -f ${{ matrix.containerfile }} .
+
+      - name: Execute AppImage build inside container
+        run: |
+          mkdir -p dist
+          podman run --rm \
+            -v "${{ github.workspace }}":/workspace:z \
+            picoforge-builder:${{ matrix.variant }} \
+            /workspace/build.sh ${{ matrix.variant }}
+
+      - name: Upload AppImage Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: picoforge-appimage-${{ matrix.variant }}
+          path: dist/*.AppImage
+
+      - name: Create GitHub Release on Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/*.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
